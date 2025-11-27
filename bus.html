@@ -1,196 +1,403 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bus Allocation — Coming Soon</title>
-  <style>
-    :root{
-      --bg:#0f1724;        /* dark blue/charcoal */
-      --card:#0b1220;      /* slightly darker card */
-      --accent:#ffd166;    /* warm accent */
-      --muted:#94a3b8;
-      --glass: rgba(255,255,255,0.04);
-      --radius:18px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 2 Bus Allocation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:
-        radial-gradient(600px 400px at 10% 20%, rgba(255,209,102,0.06), transparent 8%),
-        radial-gradient(500px 350px at 90% 80%, rgba(99,102,241,0.04), transparent 8%),
-        var(--bg);
-      color: #e6eef8;
-      -webkit-font-smoothing:antialiased;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-    .card{
-      width:100%;
-      max-width:880px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--radius);
-      padding:36px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-      display:grid;
-      grid-template-columns: 160px 1fr;
-      gap:24px;
-      align-items:center;
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.03);
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
 
-    /* small screens: stack */
-    @media (max-width:640px){
-      .card{grid-template-columns: 1fr; text-align:center; padding:28px;}
-    }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-    .bus-wrap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:120px;
-    }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
 
-    /* bus icon + animation */
-    .bus{
-      width:140px;
-      max-width:100%;
-      transform-origin:center;
-      animation: float 3.8s ease-in-out infinite;
-    }
-    @keyframes float{
-      0%{transform:translateY(0)}
-      50%{transform:translateY(-8px)}
-      100%{transform:translateY(0)}
-    }
+        .search-filter {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
 
-    .content h1{
-      margin:0 0 8px 0;
-      font-size:clamp(20px, 3.6vw, 34px);
-      letter-spacing: -0.02em;
-      line-height:1.05;
-    }
-    .content p{
-      margin:0 0 18px 0;
-      color:var(--muted);
-      font-size:clamp(13px, 1.6vw, 15px);
-    }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
 
-    .pill{
-      display:inline-flex;
-      gap:10px;
-      align-items:center;
-      background:var(--glass);
-      padding:8px 12px;
-      border-radius:999px;
-      color:var(--muted);
-      font-weight:600;
-      font-size:13px;
-      border:1px solid rgba(255,255,255,0.02);
-    }
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
 
-    .accent-dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:linear-gradient(180deg, #ffd166, #f79e02);
-      box-shadow:0 6px 18px rgba(247,158,2,0.14);
-      animation: pulse 1.8s infinite;
-    }
-    @keyframes pulse{
-      0%{transform:scale(1); opacity:0.95}
-      50%{transform:scale(1.35); opacity:0.7}
-      100%{transform:scale(1); opacity:0.95}
-    }
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
 
-    .footer{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-top:14px;
-      color:var(--muted);
-      font-size:13px;
-    }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
 
-    .small-muted{color:var(--muted); font-size:13px}
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
 
-    /* subtle responsive padding */
-    @media (max-width:420px){
-      body{padding:16px}
-      .card{padding:20px}
-    }
-  </style>
+        .filter-btn:hover, .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            padding: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .bus-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .bus-1 { background: #4CAF50; }
+        .bus-2 { background: #2196F3; }
+        .bus-3 { background: #FF9800; }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 18px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .search-filter {
+                padding: 15px;
+            }
+
+            .table-container {
+                padding: 15px;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .filter-btn {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <main class="card" role="main" aria-labelledby="headline">
-    <div class="bus-wrap" aria-hidden="true">
-      <!-- Simple bus SVG (keeps file self-contained) -->
-      <svg class="bus" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="bus icon">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stop-color="#ffd166"/>
-            <stop offset="1" stop-color="#f79e02"/>
-          </linearGradient>
-        </defs>
-        <rect x="3" y="14" width="58" height="30" rx="4" fill="#1f2937"/>
-        <rect x="6" y="10" width="46" height="10" rx="2" fill="#0b1220"/>
-        <rect x="52" y="16" width="8" height="8" rx="1" fill="#0b1220"/>
-        <rect x="10" y="20" width="10" height="8" rx="1" fill="#e6eef8" opacity="0.95"/>
-        <rect x="22" y="20" width="10" height="8" rx="1" fill="#e6eef8" opacity="0.95"/>
-        <rect x="34" y="20" width="10" height="8" rx="1" fill="#e6eef8" opacity="0.95"/>
-        <circle cx="18" cy="46" r="4.5" fill="#0b1220" stroke="#2b3440" stroke-width="1"/>
-        <circle cx="46" cy="46" r="4.5" fill="#0b1220" stroke="#2b3440" stroke-width="1"/>
-        <rect x="4" y="36" width="20" height="4" rx="1.5" fill="url(#g)" opacity="0.14"/>
-        <rect x="40" y="36" width="18" height="4" rx="1.5" fill="url(#g)" opacity="0.14"/>
-      </svg>
+    <div class="container">
+        <header>
+            <h1>🚌 Day 2 Bus Allocation</h1>
+            <p>Attendance & Transportation Details</p>
+        </header>
+
+        <div class="search-filter">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search by name or organization...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-bus="all">All Buses</button>
+                <button class="filter-btn" data-bus="BUS 1">Bus 1</button>
+                <button class="filter-btn" data-bus="BUS 2">Bus 2</button>
+                <button class="filter-btn" data-bus="BUS 3">Bus 3</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Organization</th>
+                        <th>Bus</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                No results found
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Total Attendees</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="bus1Count">0</div>
+                <div class="stat-label">Bus 1</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="bus2Count">0</div>
+                <div class="stat-label">Bus 2</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="bus3Count">0</div>
+                <div class="stat-label">Bus 3</div>
+            </div>
+        </div>
     </div>
 
-    <div class="content">
-      <!-- NOTE: text matches your requested phrasing exactly. -->
-      <h1 id="headline">Bus allocation list comming soon</h1>
-      <p class="small-muted">We're preparing the allocation list. Check back shortly for updates.</p>
+    <script>
+        const attendees = [
+            {name: "Philip kubende", org: "Practical Action", bus: "BUS 1"},
+            {name: "Bonventure Biko", org: "Practical Action", bus: "BUS 1"},
+            {name: "PATRICK LUMUMBA OBADHI", org: "African Guarantee Fund", bus: "BUS 1"},
+            {name: "PTER MURIMI", org: "African Guarantee Fund", bus: "BUS 1"},
+            {name: "JOSHUA OBENGELE", org: "African Guarantee Fund", bus: "BUS 1"},
+            {name: "ERASTE BIZIMANA", org: "African Guarantee Fund", bus: "BUS 1"},
+            {name: "John Waweru", org: "iDE Global", bus: "BUS 1"},
+            {name: "Janet Mumassabba", org: "MEDA", bus: "BUS 1"},
+            {name: "Godfret Nyangori", org: "MESPT", bus: "BUS 1"},
+            {name: "Bonventure Obeka", org: "Pwani University", bus: "BUS 1"},
+            {name: "Doreen Kinoti", org: "MESPT", bus: "BUS 1"},
+            {name: "Eric Njoroge", org: "MESPT", bus: "BUS 1"},
+            {name: "Jackson Muriungi", org: "MESPT", bus: "BUS 1"},
+            {name: "Lispah Maina", org: "MESPT", bus: "BUS 1"},
+            {name: "Oscar Ominde Soldier", org: "Diverse", bus: "BUS 1"},
+            {name: "Benard Wanjala", org: "Ushindi Youth", bus: "BUS 1"},
+            {name: "Wilbur Mutai", org: "Uasin Gishu County, FPP", bus: "BUS 1"},
+            {name: "Dr Teresiah Ndungu", org: "Nyandarua County, Livestock", bus: "BUS 1"},
+            {name: "Subira Zingizi", org: "Entrepreneur", bus: "BUS 1"},
+            {name: "Faith Mutheu Kitata", org: "Makueni County, Entrepreneur", bus: "BUS 1"},
+            {name: "Geofrey Nyamota", org: "iDE Global", bus: "BUS 1"},
+            {name: "George Okeyo", org: "Migingo Fish Supplies", bus: "BUS 1"},
+            {name: "Francis Mwangi", org: "Heifer International", bus: "BUS 1"},
+            {name: "Benard Mainga", org: "Kwale County, FPP", bus: "BUS 2"},
+            {name: "Lonah Kisombe", org: "Rongai Acacia", bus: "BUS 2"},
+            {name: "Christine Kimosop", org: "Livestock Officer, Rongai", bus: "BUS 2"},
+            {name: "Getrude Kombora", org: "Ngarithe", bus: "BUS 2"},
+            {name: "Mwalimu Menza", org: "KALRO", bus: "BUS 2"},
+            {name: "Judy Okumu", org: "KTL Farming Ltd", bus: "BUS 2"},
+            {name: "Esther Moyi", org: "Eclof Kenya Ltd", bus: "BUS 2"},
+            {name: "Jane Maina", org: "Vert Ltd", bus: "BUS 2"},
+            {name: "Rebecca Amukhoye", org: "mespt", bus: "BUS 2"},
+            {name: "Lily Chepkorir", org: "MESPT", bus: "BUS 2"},
+            {name: "Noah Meely", org: "MESPT", bus: "BUS 2"},
+            {name: "Yvonne Anyoka", org: "Practical Action", bus: "BUS 2"},
+            {name: "Irene Gathinji", org: "MESPT", bus: "BUS 2"},
+            {name: "Monica Asuna", org: "MESPT", bus: "BUS 2"},
+            {name: "Thomas Were", org: "MESPT", bus: "BUS 2"},
+            {name: "Paul Mwilu", org: "Heifer International", bus: "BUS 2"},
+            {name: "Wairimu Munyinyi - Wahome", org: "Heifer International", bus: "BUS 2"},
+            {name: "Jemimah Wanjiku", org: "Digicow", bus: "BUS 2"},
+            {name: "Oscar Khisa", org: "Heifer International", bus: "BUS 2"},
+            {name: "Simeon Rono", org: "MESPT (DMDP)", bus: "BUS 2"},
+            {name: "Joseph Karani", org: "MESPT (DMDP)", bus: "BUS 2"},
+            {name: "Andrew Ndungu", org: "Ziada Solutions Ltd", bus: "BUS 2"},
+            {name: "Dr. John Ndungu", org: "KALRO", bus: "BUS 2"},
+            {name: "Mr. Jonathan Tole", org: "TATABA", bus: "BUS 3"},
+            {name: "Nephat Njoroge", org: "MESPT", bus: "BUS 3"},
+            {name: "Jack Runo", org: "MESPT", bus: "BUS 3"},
+            {name: "Mark Masai", org: "Nation Media", bus: "BUS 3"},
+            {name: "Dr. Edith W. Wairimu", org: "FineResults Research Services", bus: "BUS 3"},
+            {name: "Isaac Ogutu", org: "Ripple Effect", bus: "BUS 3"},
+            {name: "Noel Barasa", org: "Onja Uone Ltd", bus: "BUS 3"},
+            {name: "David Situma", org: "Onja Uone Ltd", bus: "BUS 3"},
+            {name: "Doris Gakii", org: "AGILE", bus: "BUS 3"},
+            {name: "Nicholas Maritim", org: "UGC County", bus: "BUS 3"},
+            {name: "Collins Esiraba", org: "World Vision", bus: "BUS 3"},
+            {name: "Benard Owino", org: "World Vision", bus: "BUS 3"},
+            {name: "Mathews Wanjala", org: "TMA", bus: "BUS 3"},
+            {name: "Philio Kisabit", org: "Micro-Cap Holdings Ltd", bus: "BUS 3"},
+            {name: "Emmanuel Mwiti", org: "MESPT", bus: "BUS 3"},
+            {name: "Asha Juma", org: "MESPT", bus: "BUS 3"},
+            {name: "Margaret Miano", org: "MESPT", bus: "BUS 3"},
+            {name: "Maureen Kayamba", org: "AGF", bus: "BUS 3"},
+            {name: "Jane Ngige", org: "ASNET", bus: "BUS 3"},
+            {name: "Francis Nasyomba", org: "Raisin Capital", bus: "BUS 3"},
+            {name: "Stephen Cheruiyot", org: "MESPT", bus: "BUS 3"},
+            {name: "Rachael Matayen", org: "MESPT", bus: "BUS 3"},
+            {name: "Emmanuel Juma", org: "MESPT", bus: "BUS 3"}
+        ];
 
-      <div class="pill" aria-hidden="false">
-        <span class="accent-dot" aria-hidden="true"></span>
-        <span>Not yet available</span>
-      </div>
+        let currentFilter = 'all';
+        let currentSearch = '';
 
-      <div class="footer" aria-hidden="true">
-        <span>•</span>
-        <span class="small-muted">Responsive — works on phones, tablets & desktops</span>
-      </div>
-    </div>
-
-  </main>
-
-  <script>
-    // Small, optional JS: keyboard accessible focus for the card and
-    // replace the visible text with a corrected spelling when user presses "c".
-    // (This keeps the UI static while offering a toggle for the typo.)
-    (function(){
-      const heading = document.getElementById('headline');
-
-      // Press 'c' to toggle corrected spelling (helpful if you want "coming")
-      let corrected = false;
-      document.addEventListener('keydown', (e)=>{
-        if(e.key.toLowerCase() === 'c'){
-          corrected = !corrected;
-          heading.textContent = corrected
-            ? 'Bus allocation list coming soon'
-            : 'Bus allocation list comming soon';
+        function getBusClass(bus) {
+            return bus.toLowerCase().replace(' ', '-');
         }
-      });
 
-      // small accessibility hint in console
-      console.log('Tip: press "c" to toggle corrected spelling of "coming".');
-    })();
-  </script>
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const noResults = document.getElementById('noResults');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+            tbody.innerHTML = data.map((person, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${person.name}</td>
+                    <td>${person.org}</td>
+                    <td><span class="bus-badge ${getBusClass(person.bus)}">${person.bus}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function filterData() {
+            let filtered = attendees;
+
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(p => p.bus === currentFilter);
+            }
+
+            if (currentSearch) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(currentSearch) ||
+                    p.org.toLowerCase().includes(currentSearch)
+                );
+            }
+
+            renderTable(filtered);
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = attendees.length;
+            document.getElementById('bus1Count').textContent = attendees.filter(p => p.bus === 'BUS 1').length;
+            document.getElementById('bus2Count').textContent = attendees.filter(p => p.bus === 'BUS 2').length;
+            document.getElementById('bus3Count').textContent = attendees.filter(p => p.bus === 'BUS 3').length;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase();
+            filterData();
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.bus;
+                filterData();
+            });
+        });
+
+        renderTable(attendees);
+        updateStats();
+    </script>
 </body>
 </html>
